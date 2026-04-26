@@ -2,83 +2,92 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PNR Check - Airline Style</title>
+  <title>PNR Lookup Pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .fade-in { animation: fadeIn .4s ease; }
+    @keyframes fadeIn { from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)} }
+  </style>
 </head>
-<body class="bg-gray-100">
-  <!-- Header -->
-  <header class="bg-blue-900 text-white p-4 shadow">
-    <h1 class="text-xl font-bold">Airline Booking Lookup</h1>
-  </header>  <!-- Main -->  <main class="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow">
-    <h2 class="text-2xl font-semibold mb-4">Cek Booking (PNR)</h2><div class="grid gap-4">
-  <input id="pnr" type="text" placeholder="Kode Booking (PNR)" class="border p-3 rounded-xl" />
-  <input id="lastname" type="text" placeholder="Nama Belakang" class="border p-3 rounded-xl" />
-  <button onclick="searchPNR()" class="bg-blue-600 text-white p-3 rounded-xl hover:bg-blue-700">
-    Cari Booking
+<body class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-700 flex flex-col"><!-- sounds --><audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3"></audio> <audio id="successSound" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3"></audio>
+
+<!-- header --><header class="p-6 text-white flex justify-between items-center">
+  <h1 class="text-2xl font-bold tracking-wide">✈️ PNR Lookup</h1>
+  <span class="text-xs opacity-70">Airline System</span>
+</header><!-- main card --><main class="flex-1 flex items-center justify-center px-4">
+  <div class="w-full max-w-md bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-8 text-center">
+    <h2 class="text-2xl font-bold mb-2">Cek Booking</h2>
+    <p class="text-gray-500 text-sm mb-6">Masukkan kode PNR</p><!-- input -->
+<div class="flex gap-2">
+  <input id="pnr" maxlength="6" placeholder="Contoh: ABC123"
+    class="flex-1 border p-3 rounded-xl text-center tracking-widest uppercase focus:ring-2 focus:ring-blue-500 outline-none" />
+  <button onclick="handleSearch()"
+    class="bg-blue-600 text-white px-5 rounded-xl font-semibold hover:bg-blue-700 transition">
+    Cari
   </button>
 </div>
 
-<!-- Result -->
-<div id="result" class="mt-8 hidden">
-  <h3 class="text-xl font-semibold mb-4">Detail Booking</h3>
-  <div class="border rounded-xl p-4">
-    <p><strong>Nama:</strong> <span id="r_name"></span></p>
-    <p><strong>PNR:</strong> <span id="r_pnr"></span></p>
+<!-- loading -->
+<div id="loading" class="hidden mt-6 text-blue-600 text-sm">🔎 Mencari data...</div>
+
+<!-- result -->
+<div id="result" class="hidden mt-6 text-left fade-in">
+  <div class="bg-gradient-to-r from-gray-100 to-gray-50 p-4 rounded-2xl shadow-inner">
+    <p class="font-semibold text-lg" id="r_name"></p>
+    <p class="text-sm text-gray-500 mb-2" id="r_pnr"></p>
+    <hr class="my-2">
+    <p><strong>Flight:</strong> <span id="r_flight"></span></p>
     <p><strong>Rute:</strong> <span id="r_route"></span></p>
     <p><strong>Tanggal:</strong> <span id="r_date"></span></p>
-    <p><strong>Status:</strong> <span id="r_status" class="font-semibold"></span></p>
+    <p class="mt-2"><strong>Status:</strong>
+      <span id="r_status" class="text-green-600 font-bold"></span>
+    </p>
   </div>
 </div>
 
-<!-- Error -->
-<div id="error" class="mt-6 text-red-600 hidden">Booking tidak ditemukan</div>
+<!-- error -->
+<div id="error" class="hidden mt-6 text-red-500 text-sm">❌ PNR tidak ditemukan</div>
 
-  </main>  <script>
-    // Dummy database (simulasi airline system)
-    const bookings = [
-      {
-        pnr: "ABC123",
-        lastname: "RAHMAN",
-        name: "BUDI RAHMAN",
-        route: "CGK → DPS",
-        date: "12 Mei 2026",
-        status: "Confirmed"
-      },
-      {
-        pnr: "XYZ789",
-        lastname: "SARI",
-        name: "ANI SARI",
-        route: "SUB → SIN",
-        date: "20 Juni 2026",
-        status: "Ticketed"
-      }
-    ];
+  </div>
+</main><footer class="text-center text-white text-xs opacity-70 pb-4">
+  © 2026 Airline Demo UI
+</footer><script>
+const bookings = [
+  { pnr:"ABC123", name:"BUDI RAHMAN", flight:"GA-123", route:"CGK → DPS", date:"12 Mei 2026", status:"Confirmed" },
+  { pnr:"XYZ789", name:"ANI SARI", flight:"SQ-211", route:"SUB → SIN", date:"20 Juni 2026", status:"Ticketed" }
+];
 
-    function searchPNR() {
-      const pnr = document.getElementById('pnr').value.toUpperCase();
-      const lastname = document.getElementById('lastname').value.toUpperCase();
+function playClick(){ document.getElementById('clickSound').play(); }
+function playSuccess(){ document.getElementById('successSound').play(); }
+function speak(text){ const msg=new SpeechSynthesisUtterance(text); msg.lang='id-ID'; speechSynthesis.speak(msg); }
 
-      const result = bookings.find(b => b.pnr === pnr && b.lastname === lastname);
+function handleSearch(){
+  playClick();
+  const pnr = document.getElementById('pnr').value.toUpperCase();
 
-      if (result) {
-        document.getElementById('result').classList.remove('hidden');
-        document.getElementById('error').classList.remove('hidden');
+  document.getElementById('result').classList.add('hidden');
+  document.getElementById('error').classList.add('hidden');
+  document.getElementById('loading').classList.remove('hidden');
 
-    speak("Booking tidak ditemukan");
-  }
+  setTimeout(()=>{
+    const result = bookings.find(b=>b.pnr===pnr);
+    document.getElementById('loading').classList.add('hidden');
+
+    if(result){
+      document.getElementById('result').classList.remove('hidden');
+      document.getElementById('r_name').innerText = result.name;
+      document.getElementById('r_pnr').innerText = result.pnr;
+      document.getElementById('r_flight').innerText = result.flight;
+      document.getElementById('r_route').innerText = result.route;
+      document.getElementById('r_date').innerText = result.date;
+      document.getElementById('r_status').innerText = result.status;
+      playSuccess();
+      speak('Booking ditemukan');
+    } else {
+      document.getElementById('error').classList.remove('hidden');
+      speak('PNR tidak ditemukan');
+    }
+  }, 800);
 }
 </script></body>
-</html>List.add('hidden');document.getElementById('r_name').innerText = result.name;
-    document.getElementById('r_pnr').innerText = result.pnr;
-    document.getElementById('r_route').innerText = result.route;
-    document.getElementById('r_date').innerText = result.date;
-    document.getElementById('r_status').innerText = result.status;
-  } else {
-    document.getElementById('result').classList.add('hidden');
-    document.getElementById('error').classList.remove('hidden');
-  }
-}
-
-  </script>
-</body>
 </html>
