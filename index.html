@@ -9,143 +9,121 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #000;
-  color: #fff;
+  background: url('background.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: white;
+}
+
+.overlay {
+  background: rgba(0, 0, 0, 0.65);
+  min-height: 100vh;
+  padding: 20px;
   text-align: center;
 }
 
-/* ANIMASI MASUK */
-.fade-in {
-  animation: fadeIn 1s ease;
-}
-@keyframes fadeIn {
-  from {opacity: 0; transform: translateY(20px);}
-  to {opacity: 1; transform: translateY(0);}
-}
-
-/* LOGO */
 .logo {
-  margin-top: 40px;
-}
-.logo img {
-  width: 100px;
+  width: 120px;
+  margin-top: 30px;
 }
 
-/* INPUT */
+h1 {
+  margin: 10px 0 5px;
+  font-size: 28px;
+}
+
+.subtitle {
+  color: #ccc;
+  margin-bottom: 30px;
+}
+
 input {
   width: 80%;
   padding: 15px;
-  margin-top: 15px;
-  border-radius: 12px;
-  border: 1px solid #555;
-  background: #111;
-  color: #fff;
-  font-size: 18px;
-  text-align: center;
+  border-radius: 10px;
+  border: 1px solid #888;
+  background: transparent;
+  color: white;
+  font-size: 16px;
+  margin-top: 10px;
 }
 
 button {
   width: 80%;
   padding: 15px;
   margin-top: 15px;
-  border-radius: 12px;
+  border-radius: 10px;
   border: none;
-  background: #1e3a8a;
-  color: #fff;
+  background: #1f3b73;
+  color: white;
   font-size: 18px;
-  cursor: pointer;
 }
 
-/* LOADING */
-#loading {
-  display: none;
-  margin-top: 20px;
-}
-
-/* BOARDING PASS */
-.ticket {
-  display: none;
-  background: linear-gradient(135deg, #1c1c1c, #2a2a2a);
-  border-radius: 20px;
+.card {
+  margin-top: 30px;
+  background: rgba(40, 40, 40, 0.9);
   padding: 20px;
-  margin: 20px;
-  border: 1px dashed #555;
+  border-radius: 15px;
   text-align: left;
 }
 
-hr {
-  border: 0;
-  border-top: 1px dashed #555;
-}
-
-/* STATUS */
-.status {
+.green {
   color: #00ff88;
 }
 
-/* RESPONSIVE */
-@media(min-width:600px){
-  .ticket {
-    width: 400px;
-    margin: 20px auto;
-  }
+.footer {
+  margin-top: 30px;
+  font-size: 12px;
+  color: #aaa;
 }
 </style>
+
 </head>
+<body>
 
-<body class="fade-in">
+<div class="overlay">
 
-<div class="logo">
-  <img src="logo.png">
-  <h1>AeroPass</h1>
-  <p>Fly Smart, Travel Easy</p>
-</div>
+<img src="logo.png" class="logo">
+
+<h1>AeroPass</h1>
+<div class="subtitle">Fly Smart, Travel Easy</div>
 
 <h2>Cek Booking</h2>
 <p>Masukkan kode PNR</p>
 
 <input type="text" id="pnr" placeholder="ABC123">
-<button onclick="cariPNR()">Cari</button>
+<br>
+<button onclick="cekPNR()">Cari</button>
 
-<div id="loading">🔄 Checking booking...</div>
+<div id="hasil"></div>
 
-<!-- HASIL -->
-<div class="ticket" id="hasil">
-  <h2>BUDI RAHMAN</h2>
-  <p>PNR: ABC123</p>
-  <hr>
-  <p><b>Flight:</b> GA-123</p>
-  <p><b>Route:</b> CGK → DPS</p>
-  <p><b>Tanggal:</b> 12 Mei 2026</p>
-  <p><b>Status:</b> <span class="status">Confirmed</span></p>
+<div class="footer">© 2026 AeroPass</div>
 
-  <hr>
-  <h3>Penumpang</h3>
-  <p>BUDI RAHMAN - 12A</p>
-  <p>SITI RAHMA - 12B</p>
 </div>
 
-<audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
-
 <script>
-function cariPNR() {
-  let pnr = document.getElementById("pnr").value.toUpperCase();
+function cekPNR() {
+  var pnr = document.getElementById("pnr").value;
+  var hasil = document.getElementById("hasil");
 
-  document.getElementById("clickSound").play();
+  if (pnr === "ABC123") {
+    hasil.innerHTML = `
+      <div class="card">
+        <h3>BUDI RAHMAN</h3>
+        <p>PNR: ${pnr}</p>
+        <hr>
+        <p><b>Flight:</b> GA-123</p>
+        <p><b>Rute:</b> CGK → DPS</p>
+        <p><b>Tanggal:</b> 12 Mei 2026</p>
+        <p><b>Status:</b> <span class="green">Confirmed</span></p>
 
-  document.getElementById("loading").style.display = "block";
-  document.getElementById("hasil").style.display = "none";
-
-  setTimeout(() => {
-    document.getElementById("loading").style.display = "none";
-
-    if (pnr === "ABC123") {
-      document.getElementById("hasil").style.display = "block";
-    } else {
-      alert("PNR tidak ditemukan");
-    }
-
-  }, 1500);
+        <h4>Penumpang</h4>
+        <p>BUDI RAHMAN - 12A</p>
+        <p>SITI RAHMA - 12B</p>
+      </div>
+    `;
+  } else {
+    hasil.innerHTML = `<p style="color:red;">PNR tidak ditemukan</p>`;
+  }
 }
 </script>
 
