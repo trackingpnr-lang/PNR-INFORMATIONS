@@ -1,1 +1,84 @@
+<!DOCTYPE html><html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PNR Check - Airline Style</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+  <!-- Header -->
+  <header class="bg-blue-900 text-white p-4 shadow">
+    <h1 class="text-xl font-bold">Airline Booking Lookup</h1>
+  </header>  <!-- Main -->  <main class="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow">
+    <h2 class="text-2xl font-semibold mb-4">Cek Booking (PNR)</h2><div class="grid gap-4">
+  <input id="pnr" type="text" placeholder="Kode Booking (PNR)" class="border p-3 rounded-xl" />
+  <input id="lastname" type="text" placeholder="Nama Belakang" class="border p-3 rounded-xl" />
+  <button onclick="searchPNR()" class="bg-blue-600 text-white p-3 rounded-xl hover:bg-blue-700">
+    Cari Booking
+  </button>
+</div>
 
+<!-- Result -->
+<div id="result" class="mt-8 hidden">
+  <h3 class="text-xl font-semibold mb-4">Detail Booking</h3>
+  <div class="border rounded-xl p-4">
+    <p><strong>Nama:</strong> <span id="r_name"></span></p>
+    <p><strong>PNR:</strong> <span id="r_pnr"></span></p>
+    <p><strong>Rute:</strong> <span id="r_route"></span></p>
+    <p><strong>Tanggal:</strong> <span id="r_date"></span></p>
+    <p><strong>Status:</strong> <span id="r_status" class="font-semibold"></span></p>
+  </div>
+</div>
+
+<!-- Error -->
+<div id="error" class="mt-6 text-red-600 hidden">Booking tidak ditemukan</div>
+
+  </main>  <script>
+    // Dummy database (simulasi airline system)
+    const bookings = [
+      {
+        pnr: "ABC123",
+        lastname: "RAHMAN",
+        name: "BUDI RAHMAN",
+        route: "CGK → DPS",
+        date: "12 Mei 2026",
+        status: "Confirmed"
+      },
+      {
+        pnr: "XYZ789",
+        lastname: "SARI",
+        name: "ANI SARI",
+        route: "SUB → SIN",
+        date: "20 Juni 2026",
+        status: "Ticketed"
+      }
+    ];
+
+    function searchPNR() {
+      const pnr = document.getElementById('pnr').value.toUpperCase();
+      const lastname = document.getElementById('lastname').value.toUpperCase();
+
+      const result = bookings.find(b => b.pnr === pnr && b.lastname === lastname);
+
+      if (result) {
+        document.getElementById('result').classList.remove('hidden');
+        document.getElementById('error').classList.remove('hidden');
+
+    speak("Booking tidak ditemukan");
+  }
+}
+</script></body>
+</html>List.add('hidden');document.getElementById('r_name').innerText = result.name;
+    document.getElementById('r_pnr').innerText = result.pnr;
+    document.getElementById('r_route').innerText = result.route;
+    document.getElementById('r_date').innerText = result.date;
+    document.getElementById('r_status').innerText = result.status;
+  } else {
+    document.getElementById('result').classList.add('hidden');
+    document.getElementById('error').classList.remove('hidden');
+  }
+}
+
+  </script>
+</body>
+</html>
