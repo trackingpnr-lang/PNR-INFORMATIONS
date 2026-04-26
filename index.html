@@ -5,162 +5,147 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AeroPass</title>
 
-<script src="https://cdn.tailwindcss.com"></script>
-
 <style>
-.fade { animation: fade .4s ease; }
-@keyframes fade { from{opacity:0} to{opacity:1} }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #000;
+  color: #fff;
+  text-align: center;
+}
 
-.enter { animation: enter .6s ease; }
-@keyframes enter { from{opacity:0; transform:translateY(20px)} to{opacity:1} }
+/* ANIMASI MASUK */
+.fade-in {
+  animation: fadeIn 1s ease;
+}
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(20px);}
+  to {opacity: 1; transform: translateY(0);}
+}
 
-.pulse { animation: pulse 1s infinite; }
-@keyframes pulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+/* LOGO */
+.logo {
+  margin-top: 40px;
+}
+.logo img {
+  width: 100px;
+}
+
+/* INPUT */
+input {
+  width: 80%;
+  padding: 15px;
+  margin-top: 15px;
+  border-radius: 12px;
+  border: 1px solid #555;
+  background: #111;
+  color: #fff;
+  font-size: 18px;
+  text-align: center;
+}
+
+button {
+  width: 80%;
+  padding: 15px;
+  margin-top: 15px;
+  border-radius: 12px;
+  border: none;
+  background: #1e3a8a;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* LOADING */
+#loading {
+  display: none;
+  margin-top: 20px;
+}
+
+/* BOARDING PASS */
+.ticket {
+  display: none;
+  background: linear-gradient(135deg, #1c1c1c, #2a2a2a);
+  border-radius: 20px;
+  padding: 20px;
+  margin: 20px;
+  border: 1px dashed #555;
+  text-align: left;
+}
+
+hr {
+  border: 0;
+  border-top: 1px dashed #555;
+}
+
+/* STATUS */
+.status {
+  color: #00ff88;
+}
+
+/* RESPONSIVE */
+@media(min-width:600px){
+  .ticket {
+    width: 400px;
+    margin: 20px auto;
+  }
+}
 </style>
 </head>
 
-<body class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-700 flex flex-col">
+<body class="fade-in">
 
-<!-- SOUND -->
-<audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3"></audio>
-<audio id="successSound" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3"></audio>
+<div class="logo">
+  <img src="logo.png">
+  <h1>AeroPass</h1>
+  <p>Fly Smart, Travel Easy</p>
+</div>
 
-<!-- HEADER -->
-<header class="p-6 text-white flex flex-col items-center text-center enter">
-  <img src="logo.png" class="w-16 h-16 mb-2 hover:scale-110 transition">
-  <h1 class="text-2xl font-bold">AeroPass</h1>
-  <span class="text-xs opacity-70">Fly Smart, Travel Easy</span>
-</header>
+<h2>Cek Booking</h2>
+<p>Masukkan kode PNR</p>
 
-<!-- MAIN -->
-<main class="flex-1 flex items-center justify-center px-3 sm:px-6">
-  <div class="w-full max-w-md md:max-w-lg bg-white/95 rounded-3xl shadow-2xl p-5 sm:p-8 text-center enter">
+<input type="text" id="pnr" placeholder="ABC123">
+<button onclick="cariPNR()">Cari</button>
 
-    <h2 class="text-xl sm:text-2xl md:text-3xl font-bold mb-2">Cek Booking</h2>
-    <p class="text-gray-500 mb-6">Masukkan kode PNR</p>
+<div id="loading">🔄 Checking booking...</div>
 
-    <!-- INPUT -->
-    <div class="flex flex-col sm:flex-row gap-2">
-      <input id="pnr" maxlength="6" placeholder="ABC123"
-        oninput="this.value=this.value.toUpperCase()"
-        onkeypress="if(event.key==='Enter'){search()}"
-        class="flex-1 border p-3 sm:p-4 rounded-xl text-center tracking-widest uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+<!-- HASIL -->
+<div class="ticket" id="hasil">
+  <h2>BUDI RAHMAN</h2>
+  <p>PNR: ABC123</p>
+  <hr>
+  <p><b>Flight:</b> GA-123</p>
+  <p><b>Route:</b> CGK → DPS</p>
+  <p><b>Tanggal:</b> 12 Mei 2026</p>
+  <p><b>Status:</b> <span class="status">Confirmed</span></p>
 
-      <button onclick="search()"
-        class="bg-blue-600 text-white px-4 py-3 rounded-xl hover:bg-blue-700">
-        Cari
-      </button>
-    </div>
+  <hr>
+  <h3>Penumpang</h3>
+  <p>BUDI RAHMAN - 12A</p>
+  <p>SITI RAHMA - 12B</p>
+</div>
 
-    <!-- LOADING -->
-    <div id="loading" class="hidden mt-6 text-blue-600 pulse">
-      🔎 Mencari data...
-    </div>
-
-    <!-- RESULT -->
-    <div id="result" class="hidden mt-6 text-left fade">
-      <div class="bg-gray-100 p-4 rounded-xl">
-
-        <p class="font-bold text-lg" id="name"></p>
-        <p class="text-sm text-gray-500">PNR: <span id="pnrText"></span></p>
-
-        <hr class="my-2">
-
-        <p><b>Flight:</b> <span id="flight"></span></p>
-        <p><b>Rute:</b> <span id="route"></span></p>
-        <p><b>Tanggal:</b> <span id="date"></span></p>
-        <p><b>Status:</b> <span id="status" class="text-green-600"></span></p>
-
-        <div class="mt-3">
-          <p class="font-semibold mb-1">Penumpang</p>
-          <div id="passengers"></div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ERROR -->
-    <div id="error" class="hidden mt-6 text-red-500">
-      ❌ PNR tidak ditemukan
-    </div>
-
-    <!-- INVALID -->
-    <div id="invalid" class="hidden mt-6 text-yellow-500">
-      ⚠️ PNR harus 6 karakter
-    </div>
-
-  </div>
-</main>
-
-<footer class="text-center text-white text-xs pb-4 opacity-70">
-© 2026 AeroPass
-</footer>
+<audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
 
 <script>
-const data = [
-  {
-    pnr:"ABC123",
-    passengers:[
-      {name:"BUDI RAHMAN", seat:"12A"},
-      {name:"SITI RAHMA", seat:"12B"}
-    ],
-    flight:"GA-123",
-    route:"CGK → DPS",
-    date:"12 Mei 2026",
-    status:"Confirmed"
-  }
-];
+function cariPNR() {
+  let pnr = document.getElementById("pnr").value.toUpperCase();
 
-function playClick(){document.getElementById('clickSound').play();}
-function playSuccess(){document.getElementById('successSound').play();}
-function speak(t){speechSynthesis.speak(new SpeechSynthesisUtterance(t));}
+  document.getElementById("clickSound").play();
 
-function renderPassengers(list){
-  return list.map(p=>`
-    <div class="flex justify-between border-b py-1">
-      <span>${p.name}</span>
-      <span>${p.seat}</span>
-    </div>
-  `).join("");
-}
+  document.getElementById("loading").style.display = "block";
+  document.getElementById("hasil").style.display = "none";
 
-function search(){
-  playClick();
-  const pnr=document.getElementById('pnr').value.toUpperCase();
+  setTimeout(() => {
+    document.getElementById("loading").style.display = "none";
 
-  document.getElementById('result').classList.add('hidden');
-  document.getElementById('error').classList.add('hidden');
-  document.getElementById('invalid').classList.add('hidden');
-
-  if(pnr.length!==6){
-    document.getElementById('invalid').classList.remove('hidden');
-    speak("PNR harus enam karakter");
-    return;
-  }
-
-  document.getElementById('loading').classList.remove('hidden');
-
-  setTimeout(()=>{
-    const r=data.find(x=>x.pnr===pnr);
-    document.getElementById('loading').classList.add('hidden');
-
-    if(r){
-      document.getElementById('result').classList.remove('hidden');
-      document.getElementById('name').innerText=r.passengers[0].name;
-      document.getElementById('pnrText').innerText=r.pnr;
-      document.getElementById('flight').innerText=r.flight;
-      document.getElementById('route').innerText=r.route;
-      document.getElementById('date').innerText=r.date;
-      document.getElementById('status').innerText=r.status;
-      document.getElementById('passengers').innerHTML=renderPassengers(r.passengers);
-
-      playSuccess();
-      speak("Booking ditemukan");
-    }else{
-      document.getElementById('error').classList.remove('hidden');
-      speak("PNR tidak ditemukan");
+    if (pnr === "ABC123") {
+      document.getElementById("hasil").style.display = "block";
+    } else {
+      alert("PNR tidak ditemukan");
     }
-  },800);
+
+  }, 1500);
 }
 </script>
 
