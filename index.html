@@ -15,7 +15,7 @@ body {
 }
 
 .overlay {
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(0, 0, 0, 0.45);
   min-height: 100vh;
   padding: 20px;
   text-align: center;
@@ -26,25 +26,23 @@ body {
   margin-top: 30px;
 }
 
-h1 {
-  margin: 10px 0 5px;
-  font-size: 28px;
+.subtitle {
+  color: #ddd;
 }
 
-.subtitle {
+.desc {
+  font-size: 13px;
   color: #ccc;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
 }
 
 input {
   width: 80%;
   padding: 15px;
   border-radius: 10px;
-  border: 1px solid #888;
-  background: transparent;
+  border: 1px solid #aaa;
+  background: rgba(255,255,255,0.1);
   color: white;
-  font-size: 16px;
-  margin-top: 10px;
 }
 
 button {
@@ -53,31 +51,23 @@ button {
   margin-top: 15px;
   border-radius: 10px;
   border: none;
-  background: #1f3b73;
+  background: #2d5bff;
   color: white;
-  font-size: 18px;
 }
 
 .card {
-  margin-top: 30px;
-  background: rgba(40, 40, 40, 0.9);
+  margin-top: 25px;
+  background: rgba(30,30,30,0.85);
   padding: 20px;
   border-radius: 15px;
   text-align: left;
 }
 
-.green {
-  color: #00ff88;
-}
-
-.footer {
-  margin-top: 30px;
-  font-size: 12px;
-  color: #aaa;
-}
+.valid { color: #00ff88; }
+.error { color: red; }
 </style>
-
 </head>
+
 <body>
 
 <div class="overlay">
@@ -87,44 +77,83 @@ button {
 <h1>AeroPass</h1>
 <div class="subtitle">Fly Smart, Travel Easy</div>
 
-<h2>Cek Booking</h2>
-<p>Masukkan kode PNR</p>
+<h2>Cek penerbangan Anda</h2>
+<div class="desc">Sistem ini terhubung ke maskapai dengan data realtime</div>
 
-<input type="text" id="pnr" placeholder="ABC123">
+<input type="text" id="pnr" placeholder="Masukkan kode booking">
 <br>
 <button onclick="cekPNR()">Cari</button>
 
+<div id="status"></div>
 <div id="hasil"></div>
-
-<div class="footer">© 2026 AeroPass</div>
 
 </div>
 
 <script>
-function cekPNR() {
-  var pnr = document.getElementById("pnr").value;
-  var hasil = document.getElementById("hasil");
 
-  if (pnr === "ABC123") {
+// 🔥 DATABASE MANUAL (EDIT DI SINI)
+const database = {
+  "ABC123": {
+    nama: "BUDI RAHMAN",
+    flight: "GA-123",
+    rute: "CGK → DPS",
+    tanggal: "12 Mei 2026",
+    status: "Confirmed",
+    penumpang: [
+      { nama: "BUDI RAHMAN", kursi: "12A" },
+      { nama: "SITI RAHMA", kursi: "12B" }
+    ]
+  },
+
+  "XYZ789": {
+    nama: "ANDI SAPUTRA",
+    flight: "JT-456",
+    rute: "SUB → CGK",
+    tanggal: "15 Juni 2026",
+    status: "Confirmed",
+    penumpang: [
+      { nama: "ANDI SAPUTRA", kursi: "8A" }
+    ]
+  }
+};
+
+
+// 🔍 FUNCTION CEK PNR
+function cekPNR() {
+  const pnr = document.getElementById("pnr").value.toUpperCase();
+  const data = database[pnr];
+
+  const status = document.getElementById("status");
+  const hasil = document.getElementById("hasil");
+
+  if (data) {
+    status.innerHTML = `<div class="valid">✔ Kode valid</div>`;
+
+    let penumpangHTML = "";
+    data.penumpang.forEach(p => {
+      penumpangHTML += `<p>${p.nama} - ${p.kursi}</p>`;
+    });
+
     hasil.innerHTML = `
       <div class="card">
-        <h3>BUDI RAHMAN</h3>
+        <h3>${data.nama}</h3>
         <p>PNR: ${pnr}</p>
         <hr>
-        <p><b>Flight:</b> GA-123</p>
-        <p><b>Rute:</b> CGK → DPS</p>
-        <p><b>Tanggal:</b> 12 Mei 2026</p>
-        <p><b>Status:</b> <span class="green">Confirmed</span></p>
+        <p><b>Flight:</b> ${data.flight}</p>
+        <p><b>Rute:</b> ${data.rute}</p>
+        <p><b>Tanggal:</b> ${data.tanggal}</p>
+        <p><b>Status:</b> <span class="valid">${data.status}</span></p>
 
         <h4>Penumpang</h4>
-        <p>BUDI RAHMAN - 12A</p>
-        <p>SITI RAHMA - 12B</p>
+        ${penumpangHTML}
       </div>
     `;
   } else {
-    hasil.innerHTML = `<p style="color:red;">PNR tidak ditemukan</p>`;
+    status.innerHTML = `<div class="error">✖ Kode tidak ditemukan</div>`;
+    hasil.innerHTML = "";
   }
 }
+
 </script>
 
 </body>
